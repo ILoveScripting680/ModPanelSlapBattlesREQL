@@ -1,0 +1,321 @@
+-- Delta Executor Compatible Script: Stylish MOD GUI
+
+local TweenService = game:GetService("TweenService")
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+ScreenGui.IgnoreGuiInset = true
+
+-- Colors
+local bgColor = Color3.fromRGB(18, 18, 18)
+local buttonColor = Color3.fromRGB(0, 255, 0)
+local textColor = Color3.fromRGB(255, 255, 255)
+local hoverColor = Color3.fromRGB(100, 255, 100)
+
+-- Get local player name
+local playerName = game.Players.LocalPlayer.Name
+
+-- Intro Frame
+local introFrame = Instance.new("Frame")
+introFrame.Size = UDim2.new(1, 0, 1, 0)
+introFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+introFrame.Parent = ScreenGui
+
+local introText = Instance.new("TextLabel")
+introText.Size = UDim2.new(1, 0, 0.2, 0)
+introText.Position = UDim2.new(0, 0, 0.4, 0)
+introText.Text = "Adding MOD to " .. playerName
+introText.TextSize = 40
+introText.TextColor3 = textColor
+introText.Font = Enum.Font.GothamBold
+introText.BackgroundTransparency = 1
+introText.Parent = introFrame
+
+-- Wait for 4 seconds, then show "Updated"
+wait(4)
+introText.Text = "Updated"
+
+-- Wait for 2 seconds, then remove intro
+wait(2)
+introFrame:Destroy()
+
+-- Main GUI Setup
+local modButton = Instance.new("TextButton")
+modButton.Size = UDim2.new(0, 120, 0, 40)
+modButton.Position = UDim2.new(0.95, -120, 0.6, -40)
+modButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+modButton.Text = "MOD PANEL"
+modButton.TextSize = 20
+modButton.TextColor3 = textColor
+modButton.Font = Enum.Font.GothamBold
+modButton.TextStrokeTransparency = 0.8
+modButton.Parent = ScreenGui
+
+local modFrame = Instance.new("Frame")
+modFrame.Size = UDim2.new(0, 0, 0, 0)
+modFrame.Position = UDim2.new(0.5, -115, 0.5, -175)
+modFrame.BackgroundColor3 = bgColor
+modFrame.BackgroundTransparency = 0.8
+modFrame.BorderSizePixel = 0
+modFrame.Visible = false
+modFrame.Parent = ScreenGui
+
+-- Close button and panel label
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -35, 0, 5)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.Text = "X"
+closeButton.TextSize = 18
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextStrokeTransparency = 0.5
+closeButton.Parent = modFrame
+
+local panelLabel = Instance.new("TextLabel")
+panelLabel.Size = UDim2.new(0, 100, 0, 30)
+panelLabel.Position = UDim2.new(0, 10, 0, 5)
+panelLabel.Text = "MOD PANEL"
+panelLabel.TextSize = 18
+panelLabel.TextColor3 = textColor
+panelLabel.Font = Enum.Font.GothamBold
+panelLabel.BackgroundTransparency = 1
+panelLabel.Parent = modFrame
+
+-- Toggle GUI Visibility
+local function toggleGUI()
+    if modFrame.Visible then
+        local tweenClose = TweenService:Create(
+            modFrame,
+            TweenInfo.new(0.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
+            { Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1 }
+        )
+        tweenClose:Play()
+        tweenClose.Completed:Wait()
+        modFrame.Visible = false
+    else
+        modFrame.Visible = true
+        local tweenOpen = TweenService:Create(
+            modFrame,
+            TweenInfo.new(0.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
+            { Size = UDim2.new(0, 230, 0, 350), BackgroundTransparency = 0.8 }
+        )
+        tweenOpen:Play()
+    end
+end
+
+-- Close Button Functionality
+closeButton.MouseButton1Click:Connect(function()
+    toggleGUI()
+end)
+
+modButton.MouseButton1Click:Connect(toggleGUI)
+
+-- Create Buttons with Their Functionalities
+local function createButton(text, position, callback)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0.8, 0, 0.12, 0)
+    button.Position = position
+    button.BackgroundColor3 = buttonColor
+    button.Text = text
+    button.TextSize = 18
+    button.TextColor3 = Color3.fromRGB(0, 0, 0)
+    button.Font = Enum.Font.Gotham
+    button.TextStrokeTransparency = 0.6
+    button.Parent = modFrame
+
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = hoverColor
+    end)
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = buttonColor
+    end)
+
+    -- Execute the callback function when the button is clicked
+    button.MouseButton1Click:Connect(callback)
+
+    return button
+end
+
+-- Popup Function for Player Input
+local function createPopup(title, actionCallback)
+    local popup = Instance.new("Frame")
+    popup.Size = UDim2.new(0, 300, 0, 150)
+    popup.Position = UDim2.new(0.5, -150, 0.5, -75)
+    popup.BackgroundColor3 = bgColor
+    popup.BackgroundTransparency = 0.8
+    popup.BorderSizePixel = 0
+    popup.Parent = ScreenGui
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, 0, 0.2, 0)
+    titleLabel.Text = title
+    titleLabel.TextSize = 20
+    titleLabel.TextColor3 = buttonColor
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Parent = popup
+
+    local textBox = Instance.new("TextBox")
+    textBox.Size = UDim2.new(0.8, 0, 0.3, 0)
+    textBox.Position = UDim2.new(0.1, 0, 0.35, 0)
+    textBox.Text = "Enter player name"
+    textBox.BackgroundColor3 = bgColor
+    textBox.BackgroundTransparency = 0.4
+    textBox.TextSize = 18
+    textBox.TextColor3 = textColor
+    textBox.Font = Enum.Font.Gotham
+    textBox.Parent = popup
+
+    local confirmButton = Instance.new("TextButton")
+    confirmButton.Size = UDim2.new(0.8, 0, 0.2, 0)
+    confirmButton.Position = UDim2.new(0.1, 0, 0.7, 0)
+    confirmButton.BackgroundColor3 = buttonColor
+    confirmButton.Text = "Confirm"
+    confirmButton.TextSize = 18
+    confirmButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+    confirmButton.Font = Enum.Font.GothamBold
+    confirmButton.TextStrokeTransparency = 0.6
+    confirmButton.Parent = popup
+
+    confirmButton.MouseEnter:Connect(function() confirmButton.BackgroundColor3 = hoverColor end)
+    confirmButton.MouseLeave:Connect(function() confirmButton.BackgroundColor3 = buttonColor end)
+
+    confirmButton.MouseButton1Click:Connect(function()
+        actionCallback(textBox.Text)  -- Call the action callback with the player's name
+        popup:Destroy()
+    end)
+end
+
+-- Ban Player Logic
+local banButton = createButton("Ban Player", UDim2.new(0.1, 0, 0.1, 0), function()
+    createPopup("Ban Player", function(playerName)
+        if playerName == game.Players.LocalPlayer.Name then
+            warn("You can't ban yourself!")
+        else
+            -- Execute the ban action (replace with actual ban logic)
+            print("Banning player: " .. playerName)
+        end
+    end)
+end)
+
+-- Unban Player Logic
+local unbanButton = createButton("Unban Player", UDim2.new(0.1, 0, 0.24, 0), function()
+    createPopup("Unban Player", function(playerName)
+        if playerName == game.Players.LocalPlayer.Name then
+            warn("You can't unban yourself!")
+        else
+            -- Execute the unban action (replace with actual unban logic)
+            print("Unbanning player: " .. playerName)
+        end
+    end)
+end)
+
+-- Kill Player Logic
+local killButton = createButton("Kill Player", UDim2.new(0.1, 0, 0.38, 0), function()
+    createPopup("Kill Player", function(playerName)
+        if playerName == game.Players.LocalPlayer.Name then
+            warn("You can't kill yourself!")
+        else
+            -- Execute the kill action (replace with actual kill logic)
+            print("Killing player: " .. playerName)
+        end
+    end)
+end)
+
+-- Freeze Player Logic
+local freezeButton = createButton("Freeze Player", UDim2.new(0.1, 0, 0.52, 0), function()
+    createPopup("Freeze Player", function(playerName)
+        if playerName == game.Players.LocalPlayer.Name then
+            warn("You can't freeze yourself!")
+        else
+            -- Execute the freeze action (replace with actual freeze logic)
+            print("Freezing player: " .. playerName)
+        end
+    end)
+end)
+
+-- Kill Player Logic
+local killButton = createButton("Kill Player", UDim2.new(0.1, 0, 0.38, 0), function()
+    createPopup("Kill Player", function(playerName)
+        if playerName == game.Players.LocalPlayer.Name then
+            warn("You can't kill yourself!")
+        else
+            -- Execute the kill action (replace with actual kill logic)
+            print("Killing player: " .. playerName)
+        end
+    end)
+end)
+
+-- Freeze Player Logic
+local freezeButton = createButton("Freeze Player", UDim2.new(0.1, 0, 0.52, 0), function()
+    createPopup("Freeze Player", function(playerName)
+        if playerName == game.Players.LocalPlayer.Name then
+            warn("You can't freeze yourself!")
+        else
+            -- Execute the freeze action (replace with actual freeze logic)
+            print("Freezing player: " .. playerName)
+        end
+    end)
+end)
+
+-- Teleport Player Logic
+local teleportButton = createButton("Teleport Player", UDim2.new(0.1, 0, 0.66, 0), function()
+    createPopup("Teleport Player", function(playerName)
+        if playerName == game.Players.LocalPlayer.Name then
+            warn("You can't teleport yourself!")
+        else
+            -- Execute the teleport action (replace with actual teleport logic)
+            print("Teleporting player: " .. playerName)
+        end
+    end)
+end)
+
+-- Anti-Ragdoll Logic
+
+-- Function to freeze the player
+local function freezePlayer(player)
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = character.HumanoidRootPart
+        humanoidRootPart.Anchored = true
+    end
+end
+
+-- Function to unfreeze the player
+local function unfreezePlayer(player)
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = character.HumanoidRootPart
+        humanoidRootPart.Anchored = false
+    end
+end
+
+-- Function to detect if the player is in ragdoll
+local function isRagdoll(player)
+    local character = player.Character
+    if character and character:FindFirstChild("Humanoid") then
+        local humanoid = character.Humanoid
+        if humanoid.Health == 0 then
+            return true
+        end
+    end
+    return false
+end
+
+-- Anti-Ragdoll Button
+local antiRagdollButton = createButton("Anti-Ragdoll", UDim2.new(0.1, 0, 0.8, 0), function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if not character then return end
+
+    -- Freeze player when ragdoll is detected
+    if isRagdoll(player) then
+        freezePlayer(player)
+        -- Wait until ragdoll ends and then unfreeze
+        character.Humanoid.Died:Connect(function()
+            unfreezePlayer(player)
+        end)
+    else
+        warn("No ragdoll detected.")
+    end
+end)
